@@ -531,10 +531,11 @@ const parseFlaskResults = (results) => {
 export const fetchJioSaavnSearch = async (query) => {
   const queries = [query, `${query} song`].slice(0, query.trim().split(' ').length > 2 ? 1 : 2);
 
-  // 1. Attempt Local Python Flask JioSaavn API running on port 5100
+  // 1. Attempt Local or Self-Hosted JioSaavn API
+  const JIOSAAVN_URL = process.env.JIOSAAVN_API_URL || 'http://127.0.0.1:5100';
   try {
-    console.log(`Connecting to Local JioSaavn Flask Service for queries:`, queries);
-    const promises = queries.map(q => fetch(`http://127.0.0.1:5100/result/?query=${encodeURIComponent(q)}`).then(r => r.json()));
+    console.log(`Connecting to JioSaavn Service (${JIOSAAVN_URL}) for queries:`, queries);
+    const promises = queries.map(q => fetch(`${JIOSAAVN_URL}/result/?query=${encodeURIComponent(q)}`).then(r => r.json()));
     const payloads = await Promise.all(promises);
     
     let allResults = [];
@@ -552,8 +553,8 @@ export const fetchJioSaavnSearch = async (query) => {
 
   // 2. Attempt cyberboysumanjay's popular Python Flask Vercel Wrapper
   try {
-    console.log(`Connecting to JioSaavn Public Flask Wrapper for queries:`, queries);
-    const promises = queries.map(q => fetch("https://jiosaavn-api.vercel.app/result/?query=" + encodeURIComponent(q)).then(r => r.json()));
+    console.log(`Connecting to Qtune JioSaavn Vercel Wrapper for queries:`, queries);
+    const promises = queries.map(q => fetch("https://qtune-jiosaavn-api.vercel.app/result/?query=" + encodeURIComponent(q)).then(r => r.json()));
     const payloads = await Promise.all(promises);
     
     let allResults = [];
